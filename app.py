@@ -21,10 +21,16 @@ efficiency = st.slider("Panel Efficiency (%)", 10, 25, 18)
 def get_coordinates(city, api_key):
     url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
     response = requests.get(url)
-    data = response.json()
-    if data:
-        return data[0]["lat"], data[0]["lon"]
-    else:
+    
+    try:
+        data = response.json()
+        if data and isinstance(data, list) and len(data) > 0:
+            return data[0]["lat"], data[0]["lon"]
+        else:
+            st.warning(f"City '{city}' not found. Please check the spelling.")
+            return None, None
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
         return None, None
 
 
